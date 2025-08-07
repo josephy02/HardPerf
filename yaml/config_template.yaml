@@ -1,0 +1,269 @@
+# Memory Analyzer Configuration Template
+# Complete template with all available options, explanations, and valid ranges
+
+# ==============================================================================
+# MODEL CONFIGURATION (Required Section)
+# ==============================================================================
+model:
+  # Model architecture type (Required)
+  # Choices: transformer, transformer_decoder, transformer_encoder, cnn, 
+  #          diffusion_model, vision_transformer
+  # Default: transformer
+  type: transformer
+  
+  # Model size in billions of parameters (Required)
+  # Range: 0.001 - 1000.0 (practical range: 0.1 - 175.0)
+  # Examples: 0.1 (100M), 1.0 (1B), 7.0 (7B), 13.0 (13B), 70.0 (70B)
+  size_billions: 7.0
+  
+  # Training batch size (Required)
+  # Range: 1 - 2048 (practical range: 1 - 512)
+  # Larger batch sizes require more memory
+  batch_size: 32
+  
+  # Sequence length for input tokens/features (Optional)
+  # Range: 1 - 1000000 (practical range: 128 - 32768)
+  # Default: 2048
+  # Note: Transformer attention has quadratic scaling with sequence length
+  sequence_length: 2048
+  
+  # Hidden dimension size (Optional - auto-estimated if not provided)
+  # Range: 64 - 32768 (should be multiple of 64 for transformers)
+  # Examples: 768 (small), 1024 (base), 4096 (large), 8192 (very large)
+  # Default: Auto-calculated based on model size
+  hidden_dim: 4096
+  
+  # ML framework (Optional)
+  # Choices: pytorch, tensorflow, jax
+  # Default: pytorch
+  framework: pytorch
+
+# ==============================================================================
+# HARDWARE CONFIGURATION (Required Section)
+# ==============================================================================
+hardware:
+  # GPU type for analysis (Required)
+  # Supported GPUs:
+  #   NVIDIA: B200, B300, H100, H200, A100, A100 40GB, L40S, L40
+  #   AMD: MI300X, MI300A, MI250X, MI250
+  # Default: NVIDIA H100
+  gpu_type: "NVIDIA H100"
+  
+  # Custom GPU memory capacity override (Optional)
+  # Use this to override the default memory capacity for the GPU type
+  # Range: 1 - 1000 (in GB)
+  # Default: Uses GPU specification database
+  # memory_gb: 80
+
+# ==============================================================================
+# ANALYSIS CONFIGURATION (Required Section)
+# ==============================================================================
+analysis:
+  # Enable bottleneck analysis and recommendations (Optional)
+  # When true: Runs comprehensive bottleneck detection and generates optimization recommendations
+  # When false: Runs basic progressive analysis only
+  # Default: false
+  enable_bottlenecks: true
+  
+  # Basic analysis mode (Optional)
+  # When true: Skips detailed access pattern analysis for faster execution
+  # When false: Runs full 3-stage progressive analysis
+  # Default: false
+  basic_mode: false
+  
+  # Analysis type override (Optional)
+  # Choices: progressive, bottleneck
+  # Default: Determined by enable_bottlenecks setting
+  # type: bottleneck
+
+# ==============================================================================
+# OUTPUT CONFIGURATION (Optional Section)
+# ==============================================================================
+output:
+  # Output file path (Optional)
+  # If not specified, results are only displayed on console
+  # Supports relative and absolute paths
+  file: "results/analysis_results.json"
+  
+  # Output format (Optional)
+  # Choices: json, csv, text
+  # Default: json
+  # - json: Complete results with all metadata
+  # - csv: Memory breakdown in tabular format
+  # - text: Human-readable summary
+  format: json
+  
+  # Create output directory if it doesn't exist (Optional)
+  # Default: true
+  create_dir: true
+
+# ==============================================================================
+# ADVANCED OPTIONS (Optional Section)
+# ==============================================================================
+advanced:
+  # Optimizer type (Optional - affects memory calculations)
+  # Choices: Adam, AdamW, SGD, Adafactor, Lion, 8bit_Adam
+  # Default: AdamW
+  # Different optimizers have different memory requirements:
+  # - Adam/AdamW: 2x model parameters (momentum + variance)
+  # - SGD: 1x model parameters (momentum only)
+  # - Adafactor: ~0.5x model parameters (factorized states)
+  # - 8bit_Adam: ~0.5x model parameters (quantized states)
+  optimizer: AdamW
+  
+  # Training precision (Optional)
+  # Choices: FP32, FP16, BF16, FP8
+  # Default: FP16
+  # Lower precision reduces memory usage:
+  # - FP32: Full precision (4 bytes per parameter)
+  # - FP16: Half precision (2 bytes per parameter)
+  # - BF16: Brain float 16 (2 bytes, better numerical stability)
+  # - FP8: 8-bit floating point (1 byte, experimental)
+  precision: FP16
+  
+  # Gradient checkpointing enabled (Optional)
+  # When true: Reduces activation memory by 50-80% with 15-25% compute overhead
+  # Default: false
+  activation_checkpointing: false
+  
+  # Tensor parallelism degree (Optional)
+  # Range: 1 - 8 (number of GPUs for tensor parallelism)
+  # Default: 1 (no tensor parallelism)
+  # Distributes model parameters across multiple GPUs
+  tensor_parallel: 1
+  
+  # Pipeline parallelism degree (Optional)  
+  # Range: 1 - 16 (number of pipeline stages)
+  # Default: 1 (no pipeline parallelism)
+  # Distributes model layers across multiple devices
+  pipeline_parallel: 1
+  
+  # Data parallelism degree (Optional)
+  # Range: 1 - 1024 (number of data parallel workers)
+  # Default: 1 (no data parallelism)
+  # Distributes training data across multiple devices
+  data_parallel: 1
+  
+  # Training duration for fragmentation estimation (Optional)
+  # Range: 0.1 - 1000.0 (hours)
+  # Default: 24.0
+  # Longer training leads to more memory fragmentation
+  training_hours: 24.0
+  
+  # Checkpoint frequency (Optional)
+  # Range: 0.1 - 24.0 (hours between checkpoints)
+  # Default: 1.0
+  # More frequent checkpointing reduces fragmentation
+  checkpoint_frequency: 1.0
+
+# ==============================================================================
+# MODEL-SPECIFIC OPTIONS (Optional Section)
+# ==============================================================================
+model_specific:
+  # Transformer-specific options
+  transformer:
+    # Number of attention heads (Optional - auto-estimated if not provided)
+    # Should divide hidden_dim evenly
+    # Common values: 8, 12, 16, 32, 64
+    num_attention_heads: 32
+    
+    # Feed-forward expansion factor (Optional)
+    # Range: 2 - 8, Default: 4
+    # Controls size of feed-forward intermediate layer
+    ffn_expansion_factor: 4
+    
+    # Use rotary positional embeddings (Optional)
+    # Default: true for modern transformers
+    use_rope: true
+    
+    # Use multi-query attention (Optional)  
+    # Reduces KV cache memory for inference
+    # Default: false
+    multi_query_attention: false
+  
+  # CNN-specific options  
+  cnn:
+    # Input image resolution (Optional)
+    # Default: derived from sequence_length
+    # Common values: 224, 256, 384, 512
+    image_resolution: 224
+    
+    # Number of input channels (Optional)
+    # Default: 3 (RGB images)
+    input_channels: 3
+    
+    # Use depthwise separable convolutions (Optional)
+    # Reduces parameters and memory
+    # Default: false
+    depthwise_separable: false
+  
+  # Diffusion model options
+  diffusion:
+    # Number of diffusion timesteps (Optional)
+    # Range: 100 - 2000, Default: 1000
+    # More timesteps require more memory
+    num_timesteps: 1000
+    
+    # Image channels (Optional)
+    # Default: 4 (latent space)
+    # Common values: 3 (RGB), 4 (latent), 1 (grayscale)
+    image_channels: 4
+
+# ==============================================================================
+# EXPERIMENTAL OPTIONS (Optional Section)
+# ==============================================================================
+experimental:
+  # Enable experimental features (Optional)
+  # Default: false
+  # Warning: May produce unstable results
+  enable_experimental: false
+  
+  # Use quantized analysis (Optional)
+  # Analyze models with quantized weights (INT8/INT4)
+  # Default: false
+  quantized_analysis: false
+  
+  # Memory pool optimization (Optional)
+  # Optimize memory allocation patterns
+  # Default: false
+  memory_pool_optimization: false
+  
+  # Custom memory efficiency factor (Optional)
+  # Range: 0.5 - 1.0, Default: 0.9
+  # Factor to account for memory allocation efficiency
+  memory_efficiency_factor: 0.9
+
+# ==============================================================================
+# NOTES AND TIPS
+# ==============================================================================
+# 
+# Memory Usage Guidelines:
+# - Small models (< 1B params): Can usually fit on data center GPUs
+# - Medium models (1-10B params): Typically need high-end GPUs (A100/H100)
+# - Large models (10-100B params): Require multiple GPUs or aggressive optimizations
+# - Very large models (> 100B params): Need distributed training across many GPUs
+#
+# Batch Size Guidelines:
+# - Start with batch_size = 1 to find memory requirements
+# - Use gradient accumulation for effective larger batch sizes
+# - Transformer memory scales linearly with batch size
+# - Attention memory scales quadratically with sequence length
+#
+# Optimization Priority:
+# 1. Enable mixed precision (FP16/BF16) - Easy 50% memory reduction
+# 2. Use gradient checkpointing - 50-80% activation memory reduction  
+# 3. Try memory-efficient optimizers - 50-75% optimizer memory reduction
+# 4. Consider model parallelism for very large models
+#
+# GPU Memory Recommendations by Model Size:
+# - Up to 7B parameters: A100 (80GB), H100 (80GB)
+# - 7-30B parameters: H100 (80GB), H200 (141GB)
+# - 30-70B parameters: H200 (141GB), B200 (192GB), MI300X (192GB)
+# - 70B+ parameters: B300 (256GB), multiple GPUs with parallelism
+#
+# Latest High-Performance GPUs:
+# - NVIDIA B300 (256GB): Next-generation flagship for largest models
+# - NVIDIA B200 (192GB): High-capacity training and inference
+# - NVIDIA H200 (141GB): Current flagship with HBM3e
+# - AMD MI300X (192GB): Competitive alternative with excellent memory bandwidth
+# - For multi-GPU setups, prefer GPUs with high NVLink/Infinity Fabric bandwidth

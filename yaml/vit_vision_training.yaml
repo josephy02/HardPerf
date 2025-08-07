@@ -1,0 +1,57 @@
+# Vision Transformer Configuration
+# 22B ViT optimized for 1024x1024 images on 8x NVIDIA B200
+# Memory-optimized and performance-tested configuration
+
+model:
+  type: vision_transformer
+  size_billions: 22.0
+  batch_size: 64
+  sequence_length: 4096
+  hidden_dim: 1664
+  framework: pytorch
+
+hardware:
+  gpu_type: "NVIDIA B200"
+
+cluster:
+  num_gpus: 8
+  interconnect: "nvlink_5"
+  nodes: 1
+  gpus_per_node: 8
+
+distribution:
+  strategy: "data_parallel"
+  data_parallel: 8
+  tensor_parallel: 1
+  pipeline_parallel: 1
+
+analysis:
+  enable_bottlenecks: true
+  basic_mode: false
+
+output:
+  file: "results/vit_22b_corrected.json"
+  format: json
+  create_dir: true
+
+advanced:
+  optimizer: AdamW
+  precision: FP16
+  activation_checkpointing: false
+  training_hours: 168.0
+  checkpoint_frequency: 12.0
+
+model_specific:
+  transformer:
+    num_attention_heads: 16
+    ffn_expansion_factor: 4
+    use_rope: false
+    multi_query_attention: false
+  cnn:
+    image_resolution: 1024
+    input_channels: 3
+    depthwise_separable: false
+
+experimental:
+  enable_experimental: false
+  memory_efficiency_factor: 0.90

@@ -1,0 +1,82 @@
+# Multimodal Model Configuration: Vision + Language Model
+# Hybrid approach combining vision transformer and language model
+# Data parallelism across 16x NVIDIA B200 GPUs
+
+model:
+  type: transformer_decoder  # Primary architecture
+  size_billions: 30.0  # Large multimodal model
+  batch_size: 48  # 3 per GPU (image+text pairs are memory intensive)
+  sequence_length: 8192  # Long context for vision + text
+  hidden_dim: 4096
+  framework: pytorch
+
+hardware:
+  gpu_type: "NVIDIA B200"
+
+# Multi-node cluster for multimodal training
+cluster:
+  num_gpus: 16
+  interconnect: "nvswitch_3"
+  nodes: 2
+  gpus_per_node: 8
+
+# Data parallelism for multimodal training
+distribution:
+  strategy: "data_parallel"
+  data_parallel: 16
+  tensor_parallel: 1
+  pipeline_parallel: 1
+
+analysis:
+  enable_bottlenecks: true
+  basic_mode: false
+
+output:
+  file: "results/multimodal_30b_training.json"
+  format: json
+  create_dir: true
+
+advanced:
+  optimizer: AdamW
+  precision: FP16
+  activation_checkpointing: true  # Important for multimodal
+  training_hours: 1440.0  # 2 months of training
+  checkpoint_frequency: 24.0
+
+model_specific:
+  transformer:
+    num_attention_heads: 32
+    ffn_expansion_factor: 4
+    use_rope: true
+    multi_query_attention: true  # Efficient for multimodal
+
+  # Vision component configuration
+  cnn:
+    image_resolution: 512  # Reasonable for multimodal
+    input_channels: 3
+    depthwise_separable: false
+
+# Multimodal specific settings
+multimodal_config:
+  vision_encoder_layers: 24
+  language_decoder_layers: 32
+  cross_attention_layers: 8  # Vision-language interaction
+  image_patch_size: 16
+  max_image_tokens: 1024  # 512x512 / 16x16 patches
+
+# Data loading optimization for multimodal
+data_optimization:
+  prefetch_factor: 4  # Important for image+text loading
+  num_workers: 8  # More workers for complex data
+  mixed_precision_data: true
+  image_preprocessing_gpu: true  # GPU-accelerated image processing
+
+experimental:
+  enable_experimental: true
+  memory_efficiency_factor: 0.85
+
+# Expected Performance:
+# - Memory per GPU: ~140-160 GB (fits in 192 GB B200)
+# - Training complexity: High due to multimodal data
+# - Use case: GPT-4V style vision-language models
+# - Special considerations: Image+text data loading is bottleneck

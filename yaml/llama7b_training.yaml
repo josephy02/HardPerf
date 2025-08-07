@@ -1,0 +1,36 @@
+# LLaMA 7B Training Setup
+# Realistic configuration for training a 7B parameter transformer model
+# Optimized for single H100 GPU with memory optimizations
+
+model:
+  type: transformer_decoder
+  size_billions: 7.0
+  batch_size: 16  # Conservative batch size for 7B model
+  sequence_length: 4096  # Extended context length
+  hidden_dim: 4096
+  framework: pytorch
+
+hardware:
+  gpu_type: "NVIDIA H100"
+
+analysis:
+  enable_bottlenecks: true
+  basic_mode: false
+
+output:
+  file: "results/llama_7b_analysis.json"
+  format: json
+
+advanced:
+  optimizer: AdamW
+  precision: BF16  # Better numerical stability than FP16
+  activation_checkpointing: true  # Essential for large sequence lengths
+  training_hours: 48.0  # Long training run
+  checkpoint_frequency: 2.0
+
+model_specific:
+  transformer:
+    num_attention_heads: 32
+    ffn_expansion_factor: 4
+    use_rope: true  # Rotary positional embeddings like LLaMA
+    multi_query_attention: false

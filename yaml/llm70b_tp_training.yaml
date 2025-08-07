@@ -1,0 +1,75 @@
+# Large Language Model Configuration: 70B Parameter Model
+# Tensor Parallelism Strategy for Memory Distribution
+# Optimized for 8x NVIDIA H100 GPUs with NVLink
+
+model:
+  type: transformer_decoder
+  size_billions: 70.0
+  batch_size: 32  # 4 per GPU (8 per tensor-parallel group)
+  sequence_length: 4096
+  hidden_dim: 8192  # Llama-2 70B scale
+  framework: pytorch
+
+hardware:
+  gpu_type: "NVIDIA H100"
+
+# Single-node cluster with tensor parallelism
+cluster:
+  num_gpus: 8
+  interconnect: "nvlink_5"
+  nodes: 1
+  gpus_per_node: 8
+
+# 8-way tensor parallelism for memory distribution
+distribution:
+  strategy: "tensor_parallel"
+  data_parallel: 1
+  tensor_parallel: 8  # Split model across all 8 GPUs
+  pipeline_parallel: 1
+
+analysis:
+  enable_bottlenecks: true
+  basic_mode: false
+
+output:
+  file: "results/llm_70b_tensor_parallel.json"
+  format: json
+  create_dir: true
+
+advanced:
+  optimizer: AdamW
+  precision: FP16
+  activation_checkpointing: true  # Essential for large models
+  training_hours: 2160.0  # 3 months of training
+  checkpoint_frequency: 24.0  # Daily checkpoints
+
+model_specific:
+  transformer:
+    num_attention_heads: 64  # 8192 / 128 = 64 heads
+    ffn_expansion_factor: 4  # Standard for most LLMs
+    use_rope: true  # Rotary Position Embedding
+    multi_query_attention: false
+
+experimental:
+  enable_experimental: true
+  memory_efficiency_factor: 0.85
+
+# Tensor Parallelism Configuration
+tensor_parallel_config:
+  attention_parallel: true
+  mlp_parallel: true
+  embedding_parallel: true
+  sequence_parallel: true  # Important for long sequences
+
+# Communication Optimization
+communication_optimization:
+  all_reduce_fusion: true
+  gradient_accumulation_fusion: true
+  overlap_computation_communication: true
+  use_fp16_all_reduce: true
+
+# Expected Performance:
+# - Memory per GPU: ~60-70 GB (fits in 80 GB H100)
+# - Communication overhead: ~20-30% (tensor parallel is comm-heavy)
+# - Training speed: Good for very large models
+# - Use case: Large foundation models that don't fit on single GPU

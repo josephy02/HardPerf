@@ -1,0 +1,44 @@
+# Stable Diffusion Training Setup
+# U-Net architecture for text-to-image generation
+# Multi-GPU setup with tensor parallelism
+
+model:
+  type: diffusion_model
+  size_billions: 1.4  # Stable Diffusion XL size
+  batch_size: 8  # Smaller batch for diffusion training
+  sequence_length: 4096  # 64x64 latent space = 4,096 elements
+  hidden_dim: 1280  # U-Net hidden dimension
+  framework: pytorch
+
+hardware:
+  gpu_type: "NVIDIA A100"
+
+analysis:
+  enable_bottlenecks: true
+  basic_mode: false
+
+output:
+  file: "results/diffusion_model_analysis.json"
+  format: json
+
+advanced:
+  optimizer: AdamW
+  precision: BF16  # Stable training for generative models
+  activation_checkpointing: true  # U-Net can be memory intensive
+  tensor_parallel: 2  # Use 2 GPUs for tensor parallelism
+  training_hours: 168.0  # Week-long training
+  checkpoint_frequency: 6.0  # Checkpoint every 6 hours
+
+model_specific:
+  diffusion:
+    num_timesteps: 1000  # Standard DDPM timesteps
+    image_channels: 4  # Latent space channels
+    
+  transformer:
+    num_attention_heads: 16  # U-Net attention heads
+    ffn_expansion_factor: 4
+    use_rope: false  # U-Net uses different position encoding
+
+experimental:
+  enable_experimental: true
+  memory_pool_optimization: true  # Optimize for variable-size tensors

@@ -1,0 +1,35 @@
+# Large CNN for Computer Vision
+# ResNet-style architecture for high-resolution image processing
+# Optimized for A100 GPU with high batch throughput
+
+model:
+  type: cnn
+  size_billions: 2.5  # Large CNN with many layers
+  batch_size: 128  # High batch size for CNN training
+  sequence_length: 50176  # 224x224 image = 50,176 pixels
+  hidden_dim: 2048  # Feature dimension
+  framework: pytorch
+
+hardware:
+  gpu_type: "NVIDIA A100"
+
+analysis:
+  enable_bottlenecks: true
+  basic_mode: false
+
+output:
+  file: "results/large_cnn_analysis.json"
+  format: json
+
+advanced:
+  optimizer: SGD  # Common for CNN training
+  precision: FP16
+  activation_checkpointing: false  # CNNs typically don't need it
+  training_hours: 72.0  # ImageNet-style training
+  checkpoint_frequency: 4.0
+
+model_specific:
+  cnn:
+    image_resolution: 224  # Standard ImageNet resolution
+    input_channels: 3  # RGB images
+    depthwise_separable: false  # Full convolutions for accuracy

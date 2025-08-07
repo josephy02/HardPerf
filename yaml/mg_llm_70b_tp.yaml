@@ -1,0 +1,65 @@
+# 70B LLaMA Multi-GPU Configuration with Tensor Parallelism
+# Running on 8x NVIDIA H200 GPUs with proper batch sizing
+#
+# This configuration demonstrates
+# - Critical Issue: Massive Activation Memory
+#    1,187 GB activations per GPU (needs ~93% reduction!)
+#    Activation memory is 135.7x larger than model parameters (should be ~1-2x)
+#    Total overflow: 1,353 GB per GPU beyond H200 capacity
+#    Root Cause Analysis: 
+#     The issue is batch size 32 with sequence length 4096 creates enormous activation tensors
+#     32 batch × 4096 sequence × 8192 hidden_dim = massive intermediate activations
+#     Tensor parallelism doesn't reduce activation memory much
+
+model:
+  type: transformer_decoder
+  size_billions: 70.0
+  batch_size: 32  # Total batch size (4 per tensor-parallel group)
+  sequence_length: 4096  # Context length like LLaMA-2
+  hidden_dim: 8192  # Hidden dimension for 70B model
+  framework: pytorch
+
+hardware:
+  gpu_type: "NVIDIA H200"
+
+# Multi-GPU cluster configuration
+cluster:
+  num_gpus: 8
+  interconnect: "nvlink_5"  # High-bandwidth NVLink
+  nodes: 1  # Single-node setup
+  gpus_per_node: 8
+
+# Tensor parallelism distribution strategy
+distribution:
+  strategy: "tensor_parallel"
+  tensor_parallel: 8  # 8-way tensor parallelism
+  data_parallel: 1
+  pipeline_parallel: 1
+
+analysis:
+  enable_bottlenecks: true
+  basic_mode: false
+
+output:
+  file: "results/llama_70b_tensor_parallel_corrected.json"
+  format: json
+  create_dir: true
+
+advanced:
+  optimizer: AdamW
+  precision: BF16  # Better numerical stability for large models
+  activation_checkpointing: true  # Critical for memory efficiency
+  training_hours: 168.0  # 1 week of training
+  checkpoint_frequency: 4.0  # Frequent checkpoints for large models
+
+model_specific:
+  transformer:
+    num_attention_heads: 64  # Matches 70B architecture (8192/128=64)
+    ffn_expansion_factor: 4  # Standard 4x expansion in FFN
+    use_rope: true  # Rotary positional embeddings
+    multi_query_attention: false  # Full attention for quality
+
+experimental:
+  enable_experimental: true  # Enable for large model optimizations
+  memory_efficiency_factor: 0.85  # Realistic for tensor parallel
+
