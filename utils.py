@@ -1,17 +1,3 @@
-"""
-Author              : Joseph Yared
-Copyright           :
-File Name           : training_workload.py
-Description         : Utility Functions for Memory Performance Analysis
-                      Centralized helper functions and calculations
-
-
-Revision History    :
-Date                  Author               Comments
---------------------------------------------------------------------------------------------------
-
-"""
-
 import math
 import logging
 from enum import Enum

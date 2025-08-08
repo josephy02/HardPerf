@@ -1,18 +1,4 @@
 #!/usr/bin/env python
-"""
-Author              :
-Copyright           :
-File Name           : mprofile-training.py of memprof-training, Memory Profiler under ML Training
-Description         : Memory Performance Analysis Tool (mprofile-training)
-                      Command-line interface with training time estimation and feasibility assessment
-                      Algorithm configuration optimization on Fixed Infrastructure
-
-
-Revision History    :
-Date                  Author               Comments
---------------------------------------------------------------------------------------------------
-
-"""
 
 import os
 import sys

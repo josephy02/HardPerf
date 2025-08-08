@@ -1,16 +1,3 @@
-"""
-Author              : Joseph Yared
-Copyright           :
-File Name           : training_recommendatiomns.py
-Description         : Enhanced Memory Optimization Recommendations Engine
-
-
-Revision History    :
-Date                  Author               Comments
---------------------------------------------------------------------------------------------------
-
-"""
-
 import logging
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass

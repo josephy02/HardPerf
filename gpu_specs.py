@@ -1,18 +1,3 @@
-"""
-Author              :
-Copyright           :
-File Name           : gpu_specs.py of memprof-training, Memory Profiler under ML Training
-Description         : GPU Hardware Specifications
-                      Centralized hardware data for memory performance analysis
-                      Enhanced with multi-GPU and interconnect support
-
-
-Revision History    :
-Date                  Author               Comments
---------------------------------------------------------------------------------------------------
-
-"""
-
 from dataclasses import dataclass
 from typing import Dict, Optional, List
 import logging

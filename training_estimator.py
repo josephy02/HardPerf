@@ -1,18 +1,3 @@
-"""
-Author              :
-Copyright           :
-File Name           : training_estimator.py
-Description         : Training Time Estimation Module
-                      Simple but effective training time prediction based on model size, hardware, and benchmarks
-
-
-Revision History    :
-Date                  Author               Comments
---------------------------------------------------------------------------------------------------
-
-"""
-
-
 import logging
 import math
 from dataclasses import dataclass

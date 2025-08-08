@@ -1,17 +1,3 @@
-"""
-Author              :
-Copyright           :
-File Name           : training_parallel.py
-Description         : Distribution Strategies for Multi-GPU Training
-                      Memory and performance analysis for different parallelization approaches
-
-
-Revision History    :
-Date                  Author               Comments
---------------------------------------------------------------------------------------------------
-
-"""
-
 import logging
 import math
 from dataclasses import dataclass

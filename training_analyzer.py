@@ -1,17 +1,3 @@
-"""
-Author              :
-Copyright           :
-File Name           : training_analyzer.py
-Description         : Memory Performance Analyzer
-                      Consolidated memory analysis with progressive pipeline and bottleneck detection
-
-
-Revision History    :
-Date                  Author               Comments
---------------------------------------------------------------------------------------------------
-
-"""
-
 import logging
 import time
 from dataclasses import dataclass

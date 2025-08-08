@@ -1,17 +1,3 @@
-"""
-Author              :
-Copyright           :
-File Name           : cluster_specs.py of memprof-training, Memory Profiler under ML Training
-Description         : AI/ML Multi-GPU Cluster Specifications
-                      Hardware topology and interconnect modeling for distributed ML workloads
-
-
-Revision History    :
-Date                  Author               Comments
---------------------------------------------------------------------------------------------------
-
-"""
-
 import logging
 from dataclasses import dataclass
 from typing import Dict, List

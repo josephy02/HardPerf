@@ -1,8 +1,8 @@
-# memprof-training: Training Memory Performance Analysis Tool
+# HardPerf: Training (adding Inferecnce soon..) Memory Performance Analysis Tool
 
 Predict memory usage and performance for ML model training by analyzing memory requirements, bottlenecks, and optimization opportunities before you start AI model training.
 
-## Why memprof-training?
+## Why?
 
 Training large language models and other AI models requires careful memory management and resource planning. A single OOM (Out of Memory) error can waste hours of compute time and thousands of dollars in cloud resources. Traditional approaches rely on trial-and-error configuration tuning, where memory issues are discovered only after training has already begun.
 
@@ -124,8 +124,8 @@ RECOMMENDATIONS:
 1. [CRITICAL] CRITICAL: Enable Flash Attention for Long Sequences
    Description: Standard attention with 4096 sequence length requires 156GB memory.
    • ⚡ Enable Flash Attention IMMEDIATELY (reduces memory from TB to GB scale)
-   • 📦 Install: pip install flash-attn (for PyTorch)
-   • 🔧 Replace standard attention with Flash Attention in your model
+   • Install: pip install flash-attn (for PyTorch)
+   • Replace standard attention with Flash Attention in your model
    Expected: Reduce from 156GB to ~16GB (90%+ reduction)
 
 2. [HIGH] Reduce Memory Usage (Required)
@@ -448,9 +448,9 @@ Intended to adopt MIT License
 
 ## Support
 
-- 🐛 [Issues](https://github.com/zippang/memprof-training/issues) - Bug reports and feature requests
-- 💬 [Discussions](https://github.com/zippang/memprof-training/discussions) - Questions and community
-- 📧 Contact: wonsuk.lee@sk.com or wonsuk.lee@snu.ac.kr
+- [Issues](https://github.com/josephy02/HardPerf/issues) - Bug reports and feature requests
+- [Discussions](https://github.com/josephy02/HardPerf/discussions) - Questions and community
+- Contact: josephyared0@gmail.com
 
 ---
 

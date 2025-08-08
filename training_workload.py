@@ -1,17 +1,3 @@
-"""
-Author              : Joseph Yared
-Copyright           :
-File Name           : training_workload.py
-Description         : Memory Workload Models for ML Architectures
-                      Architecture-specific memory estimation and access pattern analysis
-
-
-Revision History    :
-Date                  Author               Comments
---------------------------------------------------------------------------------------------------
-
-"""
-
 import math
 import logging
 from dataclasses import dataclass
